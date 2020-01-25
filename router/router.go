@@ -26,21 +26,9 @@ type (
 	}
 )
 
-// NewREST returns a pointer to a new RESTRouter object
-func NewREST() *RESTRouter {
-	r := &RESTRouter{}
-	r.routes = make(map[string]branch)
-	return r
-}
-
-// NewHTTP returns a pointer to a new HTTPRouter object
-func NewHTTP() *HTTPRouter {
-	r := &HTTPRouter{}
-	r.routes = make(map[string]branch)
-	return r
-}
-
 // Add adds a new path to the router
+// handlerFunc can be a RESTHandlerFunc, HTTPHandlerFunc (depending on wich router you use)
+// it may also be a slice of multiple of those handlers.
 func (r *baseRouter) Add(method, path string, handlerFunc interface{}) {
 	path = strings.Trim(path, "/")
 
@@ -54,6 +42,9 @@ func (r *baseRouter) Add(method, path string, handlerFunc interface{}) {
 		panic("path too long: " + path)
 	}
 
+	if r.routes == nil {
+		r.routes = make(map[string]branch)
+	}
 	if r.routes[method] == nil {
 		r.routes[method] = make(branch)
 	}

@@ -12,7 +12,8 @@ import (
 
 func TestMultihandler(t *testing.T) {
 	test := assert.New(t)
-	r := router.NewREST()
+	r := router.RESTRouter{}
+
 	r.GET("/foo/bar/baz/moinsen",
 		func(c *context.REST) { c.Set("memory", "drink?") },
 		func(c *context.REST) { c.String(200, c.Get("memory").(string)+" coffee!") },
@@ -35,7 +36,7 @@ func TestMultihandler(t *testing.T) {
 
 func TestRESTRouter(t *testing.T) {
 	test := assert.New(t)
-	r := router.NewREST()
+	r := router.RESTRouter{}
 
 	r.GET("/foo/bar/baz/moin", func(c *context.REST) { c.String(418, "I'm a teapot") })
 
@@ -100,7 +101,7 @@ func TestRESTRouter(t *testing.T) {
 
 func TestFindWithParams(t *testing.T) {
 	test := assert.New(t)
-	r := router.NewREST()
+	r := router.RESTRouter{}
 
 	r.Add(http.MethodGet, "/foo/{b}/moin/{name}", func(c *context.REST) {
 		c.String(200, c.Param("b")+" "+c.Param("name"))
