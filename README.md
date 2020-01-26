@@ -31,5 +31,5 @@ func main() {
 As the path parameter implies, for registration of a new route simply copy the path from your API Gateway on AWS.
 
 ## License
-Free to use, wherever you want. Don't claim it as yours and do not seel it.<br>
+Free to use, wherever you want. Don't claim it as yours and do not sell it.<br>
 If you improve or enhance it, provide it as a pull request, so everyone can enjoy.
