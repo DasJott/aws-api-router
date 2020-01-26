@@ -12,7 +12,7 @@ import (
 
 func TestMultihandler(t *testing.T) {
 	test := assert.New(t)
-	r := router.RESTRouter{}
+	r := router.NewRESTRouter()
 
 	r.GET("/foo/bar/baz/moinsen",
 		func(c *context.REST) { c.Set("memory", "drink?") },
@@ -31,12 +31,11 @@ func TestMultihandler(t *testing.T) {
 		ok = ok && test.EqualValues("drink? coffee!", resp.Body)
 		ok = ok && test.EqualValues(200, resp.StatusCode)
 	}
-
 }
 
-func TestRESTRouter(t *testing.T) {
+func TestFind(t *testing.T) {
 	test := assert.New(t)
-	r := router.RESTRouter{}
+	r := router.NewRESTRouter()
 
 	r.GET("/foo/bar/baz/moin", func(c *context.REST) { c.String(418, "I'm a teapot") })
 
@@ -83,7 +82,7 @@ func TestRESTRouter(t *testing.T) {
 		test.Nil(resp)
 	}
 
-	r.Add(http.MethodGet, "/foo/bar/baz/moinsen", func(c *context.REST) { c.String(419, "coffee?") })
+	r.GET("/foo/bar/baz/moinsen", func(c *context.REST) { c.String(419, "coffee?") })
 
 	{ // don't find the other
 		req := &events.APIGatewayProxyRequest{
@@ -101,9 +100,9 @@ func TestRESTRouter(t *testing.T) {
 
 func TestFindWithParams(t *testing.T) {
 	test := assert.New(t)
-	r := router.RESTRouter{}
+	r := router.NewRESTRouter()
 
-	r.Add(http.MethodGet, "/foo/{b}/moin/{name}", func(c *context.REST) {
+	r.GET("/foo/{b}/moin/{name}", func(c *context.REST) {
 		c.String(200, c.Param("b")+" "+c.Param("name"))
 	})
 
@@ -151,7 +150,7 @@ func TestFindWithParams(t *testing.T) {
 		test.NotNil(err)
 	}
 
-	r.Add(http.MethodGet, "/foo/bar/baz/moinsen", func(c *context.REST) {
+	r.GET("/foo/bar/baz/moinsen", func(c *context.REST) {
 		if len(c.Params) > 0 {
 			c.String(400, "wrong")
 		} else {
@@ -173,7 +172,7 @@ func TestFindWithParams(t *testing.T) {
 	}
 
 	// similar but no param
-	r.Add(http.MethodGet, "/foo/bar/moin/moinsen", func(c *context.REST) {
+	r.GET("/foo/bar/moin/moinsen", func(c *context.REST) {
 		if len(c.Params) > 0 {
 			c.String(400, "wrong")
 		} else {
@@ -193,4 +192,39 @@ func TestFindWithParams(t *testing.T) {
 		test.EqualValues("right", resp.Body)
 		test.EqualValues(202, resp.StatusCode)
 	}
+}
+
+func TestGroups(t *testing.T) {
+	test := assert.New(t)
+	r := router.NewRESTRouter()
+	r.Add(http.MethodGet, "/find/me", func(c *context.REST) { c.String(200, "direct") })
+
+	g := r.Group("/basic")
+	g.GET("/find/me", func(c *context.REST) { c.String(200, "group") })
+
+	{ // find it
+		req := &events.APIGatewayProxyRequest{
+			Path:       "/find/me",
+			HTTPMethod: http.MethodGet,
+		}
+		resp, err := r.Handle(req)
+		ok := test.Nil(err)
+		ok = ok && test.NotNil(resp)
+
+		ok = ok && test.EqualValues("direct", resp.Body)
+		ok = ok && test.EqualValues(200, resp.StatusCode)
+	}
+	{ // find it
+		req := &events.APIGatewayProxyRequest{
+			Path:       "/basic/find/me",
+			HTTPMethod: http.MethodGet,
+		}
+		resp, err := r.Handle(req)
+		ok := test.Nil(err)
+		ok = ok && test.NotNil(resp)
+
+		ok = ok && test.EqualValues("group", resp.Body)
+		ok = ok && test.EqualValues(200, resp.StatusCode)
+	}
+
 }

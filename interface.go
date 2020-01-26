@@ -1,6 +1,8 @@
 package api
 
-import "github.com/dasjott/aws-api-router/router"
+import (
+	"github.com/dasjott/aws-api-router/router"
+)
 
 type (
 	// M is for creating quick json responses
@@ -9,12 +11,10 @@ type (
 
 // NewREST returns a pointer to a new RESTRouter object
 func NewREST() *router.RESTRouter {
-	r := &router.RESTRouter{}
-	return r
+	return router.NewRESTRouter()
 }
 
 // NewHTTP returns a pointer to a new HTTPRouter object
 func NewHTTP() *router.HTTPRouter {
-	r := &router.HTTPRouter{}
-	return r
+	return router.NewHTTPRouter()
 }

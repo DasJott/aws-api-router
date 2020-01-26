@@ -26,10 +26,10 @@ type (
 	}
 )
 
-// Add adds a new path to the router
+// add adds a new path to the router
 // handlerFunc can be a RESTHandlerFunc, HTTPHandlerFunc (depending on wich router you use)
 // it may also be a slice of multiple of those handlers.
-func (r *baseRouter) Add(method, path string, handlerFunc interface{}) {
+func (r *baseRouter) add(method, path string, handlerFunc interface{}) {
 	path = strings.Trim(path, "/")
 
 	h := &handler{
@@ -95,17 +95,6 @@ func (r *baseRouter) find(req *events.APIGatewayProxyRequest) *handler {
 func (r *baseRouter) Handle(req *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	if h := r.find(req); h != nil {
 		switch funcs := h.Func.(type) {
-		// Single handler
-		case func(*context.REST):
-			c := context.NewREST(req)
-			funcs(c)
-			return c.GetResponse(), nil
-		case func(*context.HTTP):
-			c := context.NewHTTP(req)
-			funcs(c)
-			return c.Response, nil
-
-		// Multihandler
 		case []RESTHandlerFunc:
 			c := context.NewREST(req)
 			for _, f := range funcs {
