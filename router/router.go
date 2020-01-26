@@ -2,6 +2,7 @@ package router
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -16,24 +17,30 @@ type (
 	branch map[string]*node
 
 	handler struct {
-		Func interface{}
+		Func  interface{}
+		Group string
 	}
 
 	// baseRouter is the base for every router
 	baseRouter struct {
-		// http.method -> map[string]*Route or anther map[string]interface{}
-		routes map[string]branch
+		routes     map[string]branch
+		preHandler map[string]interface{}
 	}
 )
 
 // add adds a new path to the router
 // handlerFunc can be a RESTHandlerFunc, HTTPHandlerFunc (depending on wich router you use)
 // it may also be a slice of multiple of those handlers.
-func (r *baseRouter) add(method, path string, handlerFunc interface{}) {
+func (r *baseRouter) add(method, path, group string, handlerFunc interface{}) {
+	if handlerFunc == nil {
+		return
+	}
+
 	path = strings.Trim(path, "/")
 
 	h := &handler{
-		Func: handlerFunc,
+		Func:  handlerFunc,
+		Group: group,
 	}
 
 	pathParts := strings.Split(path, "/")
@@ -42,9 +49,6 @@ func (r *baseRouter) add(method, path string, handlerFunc interface{}) {
 		panic("path too long: " + path)
 	}
 
-	if r.routes == nil {
-		r.routes = make(map[string]branch)
-	}
 	if r.routes[method] == nil {
 		r.routes[method] = make(branch)
 	}
@@ -94,7 +98,9 @@ func (r *baseRouter) find(req *events.APIGatewayProxyRequest) *handler {
 // Put this function into the lambda.Start function.
 func (r *baseRouter) Handle(req *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	if h := r.find(req); h != nil {
-		switch funcs := h.Func.(type) {
+		list := r.getHandlerFunctionList(h)
+
+		switch funcs := list.(type) {
 		case []RESTHandlerFunc:
 			c := context.NewREST(req)
 			for _, f := range funcs {
@@ -111,4 +117,13 @@ func (r *baseRouter) Handle(req *events.APIGatewayProxyRequest) (*events.APIGate
 	}
 
 	return nil, fmt.Errorf("route not found")
+}
+
+func (r *baseRouter) getHandlerFunctionList(h *handler) interface{} {
+	arr := reflect.MakeSlice(reflect.TypeOf(h.Func), 0, 10)
+	if g := r.preHandler[h.Group]; g != nil {
+		arr = reflect.AppendSlice(arr, reflect.ValueOf(g))
+	}
+	arr = reflect.AppendSlice(arr, reflect.ValueOf(h.Func))
+	return arr.Interface()
 }

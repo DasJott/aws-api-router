@@ -26,6 +26,8 @@ type (
 // NewHTTPRouter returns a pointer to a new HTTPRouter object
 func NewHTTPRouter() *HTTPRouter {
 	r := &HTTPRouter{}
+	r.routes = make(map[string]branch)
+	r.preHandler = make(map[string]interface{})
 	r.HTTPGroup = HTTPGroup{
 		router: r,
 	}
@@ -43,6 +45,11 @@ func (r *HTTPRouter) Group(path string) *HTTPGroup {
 	}
 }
 
+// Pre defines handler functions to be executed before every
+func (g *HTTPGroup) Pre(handle ...HTTPHandlerFunc) {
+	g.router.preHandler[g.basepath] = handle
+}
+
 // Add adds a new path to the router / group
 // handlerFunc can be a RESTHandlerFunc, HTTPHandlerFunc (depending on wich router you use)
 // it may also be a slice of multiple of those handlers.
@@ -51,7 +58,7 @@ func (g *HTTPGroup) Add(method, path string, handle ...HTTPHandlerFunc) {
 		path = "/" + path
 	}
 	path = g.basepath + path
-	g.router.add(method, path, handle)
+	g.router.add(method, path, g.basepath, handle)
 }
 
 // GET is convenient for Add(http.MethodGet, path, HTTPHandlerFunc)

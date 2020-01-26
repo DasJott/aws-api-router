@@ -23,9 +23,11 @@ type (
 	}
 )
 
-// NewRESTRouter returns a pointer to a new RESTRouter object
-func NewRESTRouter() *RESTRouter {
+// NewREST returns a pointer to a new RESTRouter object
+func NewREST() *RESTRouter {
 	r := &RESTRouter{}
+	r.routes = make(map[string]branch)
+	r.preHandler = make(map[string]interface{})
 	r.RESTGroup = RESTGroup{
 		router: r,
 	}
@@ -43,6 +45,11 @@ func (r *RESTRouter) Group(path string) *RESTGroup {
 	}
 }
 
+// Pre defines handler functions to be executed before every
+func (g *RESTGroup) Pre(handle ...RESTHandlerFunc) {
+	g.router.preHandler[g.basepath] = handle
+}
+
 // Add adds a new path to the router / group
 // handlerFunc can be a RESTHandlerFunc, HTTPHandlerFunc (depending on wich router you use)
 // it may also be a slice of multiple of those handlers.
@@ -51,7 +58,7 @@ func (g *RESTGroup) Add(method, path string, handle ...RESTHandlerFunc) {
 		path = "/" + path
 	}
 	path = g.basepath + path
-	g.router.add(method, path, handle)
+	g.router.add(method, path, g.basepath, handle)
 }
 
 // GET creates a new GET route
