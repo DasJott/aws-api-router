@@ -3,7 +3,7 @@ A simple, small and fast router for APIs using Lambda and APIGateway from AWS<br
 Written in GO it helps to easily develop quick APIs.<br>
 <br>
 This library contains a REST optimized API and a plain HTTP API router.<br>
-[_Me Like!_](paypal.me/dasjott)
+[_Me Like!_](https://paypal.me/dasjott/2EUR)
 
 ## Usage
 This library is intended to be used on a Lambda environment, but you can also use it as long as you have a APIGatewayProxyRequest object available and need back a APIGatewayProxyResponse.
@@ -36,5 +36,5 @@ Free to use, wherever you want. Don't claim it as yours and do not sell it.<br>
 If you improve or enhance it, provide it as a pull request, so everyone can enjoy.
 
 ## Donate?
-If you appreciate what I do, please consider [donation via PayPal](paypal.me/dasjott).<br>
+If you appreciate what I do, please consider [donation via PayPal](paypal.me/dasjott/2EUR).<br>
 Thank you ;-)
