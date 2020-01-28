@@ -33,3 +33,7 @@ As the path parameter implies, for registration of a new route simply copy the p
 ## License
 Free to use, wherever you want. Don't claim it as yours and do not sell it.<br>
 If you improve or enhance it, provide it as a pull request, so everyone can enjoy.
+
+## Donate?
+If you appreciate what I do, please consider [donation via PayPal](paypal.me/dasjott).<br>
+Thank you ;-)
