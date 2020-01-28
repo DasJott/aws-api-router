@@ -36,5 +36,5 @@ Free to use, wherever you want. Don't claim it as yours and do not sell it.<br>
 If you improve or enhance it, provide it as a pull request, so everyone can enjoy.
 
 ## Donate?
-If you appreciate what I do, please consider [donation via PayPal](paypal.me/dasjott/2EUR).<br>
+If you appreciate what I do, please consider [donation via PayPal](https://paypal.me/dasjott/2EUR).<br>
 Thank you ;-)
