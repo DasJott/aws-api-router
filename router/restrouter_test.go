@@ -12,7 +12,7 @@ import (
 
 func TestMultihandler(t *testing.T) {
 	test := assert.New(t)
-	r := router.NewREST()
+	r := router.NewRESTRouter()
 
 	r.GET("/foo/bar/baz/moinsen",
 		func(c *context.REST) { c.Set("memory", "drink?") },
@@ -35,7 +35,7 @@ func TestMultihandler(t *testing.T) {
 
 func TestFind(t *testing.T) {
 	test := assert.New(t)
-	r := router.NewREST()
+	r := router.NewRESTRouter()
 
 	r.GET("/foo/bar/baz/moin", func(c *context.REST) { c.String(418, "I'm a teapot") })
 
@@ -100,7 +100,7 @@ func TestFind(t *testing.T) {
 
 func TestFindWithParams(t *testing.T) {
 	test := assert.New(t)
-	r := router.NewREST()
+	r := router.NewRESTRouter()
 
 	r.GET("/foo/{b}/moin/{name}", func(c *context.REST) {
 		c.String(200, c.Param("b")+" "+c.Param("name"))
@@ -196,7 +196,7 @@ func TestFindWithParams(t *testing.T) {
 
 func TestGroups(t *testing.T) {
 	test := assert.New(t)
-	r := router.NewREST()
+	r := router.NewRESTRouter()
 	r.Add(http.MethodGet, "/find/me", func(c *context.REST) { c.String(200, "direct") })
 
 	g := r.Group("/basic")
@@ -231,7 +231,7 @@ func TestGroups(t *testing.T) {
 
 func TestPreHandler(t *testing.T) {
 	test := assert.New(t)
-	r := router.NewREST()
+	r := router.NewRESTRouter()
 
 	r.Pre(func(c *context.REST) { c.Set("value", "moin") })
 	r.GET("/foo/bar", func(c *context.REST) {
