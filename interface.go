@@ -11,7 +11,7 @@ type (
 
 // NewREST returns a pointer to a new RESTRouter object
 func NewREST() *router.RESTRouter {
-	return router.NewRESTRouter()
+	return router.NewREST()
 }
 
 // NewHTTP returns a pointer to a new HTTPRouter object
