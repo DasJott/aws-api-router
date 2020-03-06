@@ -23,8 +23,8 @@ type (
 	}
 )
 
-// NewREST returns a pointer to a new RESTRouter object
-func NewREST() *RESTRouter {
+// NewRESTRouter returns a pointer to a new RESTRouter object
+func NewRESTRouter() *RESTRouter {
 	r := &RESTRouter{}
 	r.routes = make(map[string]branch)
 	r.preHandler = make(map[string]interface{})
