@@ -86,3 +86,8 @@ func (c *REST) Param(key string) string {
 func (c *REST) Query(key string) string {
 	return c.Queries[key]
 }
+
+// Header gets the value of a header by name
+func (c *REST) Header(key string) string {
+	return c.Request.Headers[key]
+}
