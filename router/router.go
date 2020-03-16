@@ -26,7 +26,14 @@ type (
 		routes     map[string]branch
 		preHandler map[string]interface{}
 	}
+	// HTTPErrorHandler handles occuring rest errors
+	HTTPErrorHandler func(error, *context.HTTP)
+	// RESTErrorHandler handles occuring rest errors
+	RESTErrorHandler func(error, *context.REST)
 )
+
+// ErrorHandler must be one of HTTPErrorHandler or RESTErrorHandler and can be set to handle emerging errors your way
+var ErrorHandler interface{}
 
 // add adds a new path to the router
 // handlerFunc can be a RESTHandlerFunc, HTTPHandlerFunc (depending on wich router you use)
@@ -118,7 +125,25 @@ func (r *baseRouter) Handle(req *events.APIGatewayProxyRequest) (*events.APIGate
 		}
 	}
 
-	return nil, fmt.Errorf("route not found:" + req.Resource)
+	err := fmt.Errorf("route not found:" + req.Resource)
+
+	if ErrorHandler != nil {
+		switch handler := ErrorHandler.(type) {
+		case RESTErrorHandler:
+			c := context.NewREST(req)
+			handler(err, c)
+			return c.GetResponse(), err
+		case HTTPErrorHandler:
+			c := context.NewHTTP(req)
+			handler(err, c)
+			return c.Response, err
+		}
+	}
+
+	return &events.APIGatewayProxyResponse{
+		Body:       err.Error(),
+		StatusCode: 404,
+	}, err
 }
 
 func (r *baseRouter) getHandlerFunctionList(h *handler) interface{} {
