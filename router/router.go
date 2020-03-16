@@ -65,7 +65,9 @@ func (r *baseRouter) add(method, path, group string, handlerFunc interface{}) {
 		if i == last {
 			m[part].Handler = h
 		} else {
-			m[part].Branch = make(branch)
+			if m[part].Branch == nil {
+				m[part].Branch = make(branch)
+			}
 			m = m[part].Branch
 		}
 	}
@@ -73,7 +75,7 @@ func (r *baseRouter) add(method, path, group string, handlerFunc interface{}) {
 
 // Find finds the handler to the given path
 func (r *baseRouter) find(req *events.APIGatewayProxyRequest) *handler {
-	parts := strings.Split(req.Path[1:], "/")
+	parts := strings.Split(req.Resource[1:], "/")
 
 	if m, ok := r.routes[req.HTTPMethod]; ok {
 		last := len(parts) - 1
@@ -116,7 +118,7 @@ func (r *baseRouter) Handle(req *events.APIGatewayProxyRequest) (*events.APIGate
 		}
 	}
 
-	return nil, fmt.Errorf("route not found")
+	return nil, fmt.Errorf("route not found:" + req.Resource)
 }
 
 func (r *baseRouter) getHandlerFunctionList(h *handler) interface{} {
