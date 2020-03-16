@@ -114,12 +114,18 @@ func (r *baseRouter) Handle(req *events.APIGatewayProxyRequest) (*events.APIGate
 			c := context.NewREST(req)
 			for _, f := range funcs {
 				f(c)
+				if c.Aborted() {
+					break
+				}
 			}
 			return c.GetResponse(), nil
 		case []HTTPHandlerFunc:
 			c := context.NewHTTP(req)
 			for _, f := range funcs {
 				f(c)
+				if c.Aborted() {
+					break
+				}
 			}
 			return c.Response, nil
 		}
